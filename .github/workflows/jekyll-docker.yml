@@ -1,20 +1,16 @@
-name: Jekyll site CI
+      - name: Build Debug APK
+        run: gradle assembleDebug --stacktrace
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+      - name: List APKs (debug)
+        run: |
+          echo "---- outputs/apk ----"
+          ls -R app/build/outputs/apk || true
+          echo "---- find *.apk ----"
+          find . -type f -name "*.apk" -print || true
 
-jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Build the site in the jekyll/builder container
-      run: |
-        docker run \
-        -v ${{ github.workspace }}:/srv/jekyll -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
-        jekyll/builder:latest /bin/bash -c "chmod -R 777 /srv/jekyll && jekyll build --future"
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
