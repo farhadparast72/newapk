@@ -25,17 +25,22 @@ jobs:
         run: |
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-      - name: Download Gradle 8.2.2 (direct, with retry)
+      - name: Download Gradle 8.2.1 (with retry)
         run: |
           set -e
-          curl -fL --retry 5 --retry-all-errors -o gradle.zip https://downloads.gradle.org/distributions/gradle-8.2.2-bin.zip \
-            || curl -fL --retry 5 --retry-all-errors -o gradle.zip https://github.com/gradle/gradle-distributions/releases/download/v8.2.2/gradle-8.2.2-bin.zip
-          file gradle.zip
+          curl -fL --retry 5 --retry-all-errors -o gradle.zip https://services.gradle.org/distributions/gradle-8.2.1-bin.zip
           unzip -q gradle.zip
-          echo "$PWD/gradle-8.2.2/bin" >> $GITHUB_PATH
+          echo "$PWD/gradle-8.2.1/bin" >> $GITHUB_PATH
 
       - name: Build Debug APK
         run: gradle assembleDebug --stacktrace
+
+      - name: List APKs (debug)
+        run: |
+          echo "---- outputs/apk ----"
+          ls -R app/build/outputs/apk || true
+          echo "---- find *.apk ----"
+          find . -type f -name "*.apk" -print || true
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
