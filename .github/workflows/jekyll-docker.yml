@@ -25,9 +25,12 @@ jobs:
         run: |
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-      - name: Download Gradle 8.2.2
+      - name: Download Gradle 8.2.2 (direct, with retry)
         run: |
-          curl -L -o gradle.zip https://services.gradle.org/distributions/gradle-8.2.2-bin.zip
+          set -e
+          curl -fL --retry 5 --retry-all-errors -o gradle.zip https://downloads.gradle.org/distributions/gradle-8.2.2-bin.zip \
+            || curl -fL --retry 5 --retry-all-errors -o gradle.zip https://github.com/gradle/gradle-distributions/releases/download/v8.2.2/gradle-8.2.2-bin.zip
+          file gradle.zip
           unzip -q gradle.zip
           echo "$PWD/gradle-8.2.2/bin" >> $GITHUB_PATH
 
